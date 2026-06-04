@@ -171,10 +171,12 @@ export function ChatBar({
   const canSubmit = busy || hasComposerPayload
   const editingQueuedPrompt = queueEdit ? (queuedPrompts.find(entry => entry.id === queueEdit.entryId) ?? null) : null
   const busyAction = busy && hasComposerPayload ? 'queue' : 'stop'
+
   // Steer only makes sense mid-turn, text-only (the gateway can't carry images
   // into a tool result) and never for a slash command (those execute inline).
   const canSteer =
     busy && !!onSteer && attachments.length === 0 && trimmedDraft.length > 0 && !SLASH_COMMAND_RE.test(trimmedDraft)
+
   const showHelpHint = draft === '?'
 
   const { t } = useI18n()
@@ -1248,8 +1250,10 @@ export function ChatBar({
     // input event; refresh it from the editor once more to also cover an
     // in-flight keystroke that hasn't fired its input event yet.
     const editor = editorRef.current
+
     if (editor) {
       const domText = composerPlainText(editor)
+
       if (domText !== draftRef.current) {
         draftRef.current = domText
         aui.composer().setText(domText)
@@ -1260,38 +1264,44 @@ export function ChatBar({
     const payloadPresent = text.trim().length > 0 || attachments.length > 0
 
     if (queueEdit) {
-      exitQueuedEdit('save')
-    } else if (busy) {
-      // Slash commands should execute immediately even while the agent is
-      // busy — they're client-side operations (/yolo, /skin, /new, /help,
-      // etc.) or self-contained gateway RPCs (/status, /compress).  onSubmit
-      // routes them to executeSlashCommand, which has its own per-command
-      // busy guard for commands that genuinely need an idle session (skill
-      // /send directives).  Queuing them would make every slash command wait
-      // for the current turn to finish, which is how the TUI never behaves.
-      if (!attachments.length && SLASH_COMMAND_RE.test(text.trim())) {
-        const submitted = text
-        triggerHaptic('submit')
-        clearDraft()
-        void onSubmit(submitted)
-      } else if (payloadPresent) {
-        queueCurrentDraft()
-      } else {
-        // Stop button (the only way to reach here while busy with an empty
-        // composer — empty Enter is short-circuited in the keydown handler).
-        triggerHaptic('cancel')
-        void Promise.resolve(onCancel())
-      }
-    } else if (!payloadPresent && queuedPrompts.length > 0) {
-      void drainNextQueued()
-    } else if (payloadPresent) {
+    exitQueuedEdit('save')
+  } else if (trimmedDraft && SLASH_COMMAND_RE.test(trimmedDraft) && !attachments.length) {
+    // Slash commands are dispatched immediately (via onSubmit →
+    // executeSlashCommand), never queued — even when busy.
+    triggerHaptic('submit')
+    clearDraft()
+    void onSubmit(trimmedDraft)
+  } else if (busy) {
+    // Slash commands should execute immediately even while the agent is
+    // busy — they're client-side operations (/yolo, /skin, /new, /help,
+    // etc.) or self-contained gateway RPCs (/status, /compress).  onSubmit
+    // routes them to executeSlashCommand, which has its own per-command
+    // busy guard for commands that genuinely need an idle session (skill
+    // /send directives).  Queuing them would make every slash command wait
+    // for the current turn to finish, which is how the TUI never behaves.
+    if (!attachments.length && SLASH_COMMAND_RE.test(text.trim())) {
       const submitted = text
       triggerHaptic('submit')
-      resetBrowseState(sessionId)
       clearDraft()
-      clearComposerAttachments()
-      void onSubmit(submitted, { attachments })
+      void onSubmit(submitted)
+    } else if (payloadPresent) {
+      queueCurrentDraft()
+    } else {
+      // Stop button (the only way to reach here while busy with an empty
+      // composer — empty Enter is short-circuited in the keydown handler).
+      triggerHaptic('cancel')
+      void Promise.resolve(onCancel())
     }
+  } else if (!payloadPresent && queuedPrompts.length > 0) {
+    void drainNextQueued()
+  } else if (payloadPresent) {
+    const submitted = text
+    triggerHaptic('submit')
+    resetBrowseState(sessionId)
+    clearDraft()
+    clearComposerAttachments()
+    void onSubmit(submitted, { attachments })
+  }
 
     focusInput()
   }
