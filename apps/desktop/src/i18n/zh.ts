@@ -1708,8 +1708,7 @@ export const zh: Translations = {
     tryAgain: '重试',
     loadingTree: '正在加载文件树',
     loadingFiles: '正在加载文件',
-    terminalFocus: '聚焦终端视图',
-    terminalSplit: '返回分栏视图',
+    terminalHide: '隐藏终端',
     addToChat: '添加到对话'
   },
 

@@ -1661,8 +1661,7 @@ export const ja = defineLocale({
     tryAgain: '再試行',
     loadingTree: 'ファイルツリーを読み込み中',
     loadingFiles: 'ファイルを読み込み中',
-    terminalFocus: 'ターミナルビューにフォーカス',
-    terminalSplit: '分割ビューに戻る',
+    terminalHide: 'ターミナルを非表示',
     addToChat: 'チャットに追加'
   },
 

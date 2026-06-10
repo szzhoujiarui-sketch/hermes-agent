@@ -1190,8 +1190,7 @@ export interface Translations {
     tryAgain: string
     loadingTree: string
     loadingFiles: string
-    terminalFocus: string
-    terminalSplit: string
+    terminalHide: string
     addToChat: string
   }
 

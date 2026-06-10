@@ -1,6 +1,5 @@
 import '@xterm/xterm/css/xterm.css'
 
-import { useStore } from '@nanostores/react'
 import { type CSSProperties, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,7 +10,7 @@ import { useI18n } from '@/i18n'
 import { useTheme } from '@/themes/context'
 
 import { SidebarPanelLabel } from '../../shell/sidebar-label'
-import { $terminalTakeover, setTerminalTakeover } from '../store'
+import { setTerminalTakeover } from '../store'
 
 import { addSelectionShortcutLabel, terminalTheme } from './selection'
 import { useTerminalSession } from './use-terminal-session'
@@ -31,12 +30,7 @@ export function TerminalTab({ cwd, onAddSelectionToChat }: TerminalTabProps) {
     onAddSelectionToChat
   })
 
-  const takeover = useStore($terminalTakeover)
-  const label = takeover ? t.rightSidebar.terminalSplit : t.rightSidebar.terminalFocus
-
-  const toggleTakeover = () => {
-    setTerminalTakeover(!takeover)
-  }
+  const label = t.rightSidebar.terminalHide
 
   return (
     <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
@@ -46,12 +40,12 @@ export function TerminalTab({ cwd, onAddSelectionToChat }: TerminalTabProps) {
           <Button
             aria-label={label}
             className="ml-auto size-6 rounded-md text-(--ui-text-secondary)!"
-            onClick={toggleTakeover}
+            onClick={() => setTerminalTakeover(false)}
             size="icon"
             type="button"
             variant="ghost"
           >
-            <Codicon name={takeover ? 'screen-normal' : 'screen-full'} size="0.875rem" />
+            <Codicon name="close" size="0.875rem" />
           </Button>
         </Tip>
       </div>

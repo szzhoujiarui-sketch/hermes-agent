@@ -1622,8 +1622,7 @@ export const zhHant = defineLocale({
     tryAgain: '重試',
     loadingTree: '正在載入檔案樹',
     loadingFiles: '正在載入檔案',
-    terminalFocus: '聚焦終端機檢視',
-    terminalSplit: '返回分割檢視',
+    terminalHide: '隱藏終端機',
     addToChat: '新增至聊天'
   },
 

@@ -1527,8 +1527,7 @@ export const en: Translations = {
     tryAgain: 'Try again',
     loadingTree: 'Loading file tree',
     loadingFiles: 'Loading files',
-    terminalFocus: 'Focus terminal view',
-    terminalSplit: 'Return to split view',
+    terminalHide: 'Hide terminal',
     addToChat: 'Add to chat'
   },
 
