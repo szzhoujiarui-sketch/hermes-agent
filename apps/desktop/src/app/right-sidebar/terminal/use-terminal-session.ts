@@ -210,6 +210,7 @@ export function useTerminalSession({ cwd, onAddSelectionToChat }: UseTerminalSes
   const initialThemeRef = useRef(activeTheme)
   const hostRef = useRef<HTMLDivElement | null>(null)
   const termRef = useRef<Terminal | null>(null)
+  const webglRef = useRef<WebglAddon | null>(null)
   const sessionIdRef = useRef<string | null>(null)
   const shellNameRef = useRef('shell')
   const selectionLabelRef = useRef('')
@@ -554,8 +555,12 @@ export function useTerminalSession({ cwd, onAddSelectionToChat }: UseTerminalSes
       // renderer paints SGR via CSS classes that visibly mute against our skins.
       try {
         const webgl = new WebglAddon()
-        webgl.onContextLoss(() => webgl.dispose())
+        webgl.onContextLoss(() => {
+          webgl.dispose()
+          webglRef.current = null
+        })
         term.loadAddon(webgl)
+        webglRef.current = webgl
       } catch (err) {
         console.warn('[hermes-terminal] WebGL unavailable; falling back to DOM', err)
       }
@@ -586,6 +591,7 @@ export function useTerminalSession({ cwd, onAddSelectionToChat }: UseTerminalSes
 
       term.dispose()
       termRef.current = null
+      webglRef.current = null
       shellNameRef.current = 'shell'
       selectionRef.current = ''
       selectionLabelRef.current = ''
@@ -597,6 +603,10 @@ export function useTerminalSession({ cwd, onAddSelectionToChat }: UseTerminalSes
 
     if (term) {
       term.options.theme = activeTheme
+      // The WebGL renderer caches glyph colors in a texture atlas, so a
+      // light/dark switch leaves already-drawn cells stale until the atlas is
+      // cleared. No-op for the DOM fallback.
+      webglRef.current?.clearTextureAtlas()
     }
   }, [activeTheme])
 
