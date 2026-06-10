@@ -249,7 +249,6 @@ const sidebars: SidebarsConfig = {
                     'user-guide/skills/bundled/mlops/mlops-huggingface-hub',
                     'user-guide/skills/bundled/mlops/mlops-inference-llama-cpp',
                     'user-guide/skills/bundled/mlops/mlops-evaluation-lm-evaluation-harness',
-                    'user-guide/skills/bundled/mlops/mlops-inference-obliteratus',
                     'user-guide/skills/bundled/mlops/mlops-models-segment-anything',
                     'user-guide/skills/bundled/mlops/mlops-inference-vllm',
                     'user-guide/skills/bundled/mlops/mlops-evaluation-weights-and-biases',
@@ -278,15 +277,6 @@ const sidebars: SidebarsConfig = {
                     'user-guide/skills/bundled/productivity/productivity-ocr-and-documents',
                     'user-guide/skills/bundled/productivity/productivity-powerpoint',
                     'user-guide/skills/bundled/productivity/productivity-teams-meeting-pipeline',
-                  ],
-                },
-                {
-                  type: 'category',
-                  label: 'red-teaming',
-                  key: 'skills-bundled-red-teaming',
-                  collapsed: true,
-                  items: [
-                    'user-guide/skills/bundled/red-teaming/red-teaming-godmode',
                   ],
                 },
                 {
