@@ -16,6 +16,7 @@ import {
 } from '@/store/layout'
 import { $paneWidthOverride } from '@/store/panes'
 import { $connection } from '@/store/session'
+import { isSecondaryWindow } from '@/store/windows'
 
 import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from '../layout-constants'
 
@@ -90,12 +91,15 @@ export function AppShell({
   // window's left edge. Default layout: the sessions sidebar sits there.
   // Flipped layout: the file browser does instead. Both force-collapse to a
   // hover-reveal overlay (0px track) below the collapse breakpoint, so the edge
-  // is uncovered there regardless of their stored open state.
+  // is uncovered there regardless of their stored open state. A standalone
+  // session window renders no sidebar at all, so its edge is always uncovered.
   const collapsibleLeftPaneOpen = panesFlipped ? fileBrowserOpen : sidebarOpen
   // The terminal + preview rails never force-collapse, so when they're the
   // leftmost open pane (flipped layout) they cover the edge even when narrow.
   const persistentLeftPaneOpen = panesFlipped && (terminalPaneOpen || previewPaneOpen)
-  const leftEdgePaneOpen = (!narrowViewport && collapsibleLeftPaneOpen) || persistentLeftPaneOpen
+
+  const leftEdgePaneOpen =
+    !isSecondaryWindow() && ((!narrowViewport && collapsibleLeftPaneOpen) || persistentLeftPaneOpen)
 
   const titlebarContentInset = leftEdgePaneOpen
     ? 0
