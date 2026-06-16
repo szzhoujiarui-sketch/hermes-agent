@@ -642,14 +642,20 @@ function CronJobRuns({
 }) {
   const [runs, setRuns] = useState<null | SessionInfo[]>(null)
   const [error, setError] = useState<string | null>(null)
+  const cancelledRef = useRef(false)
 
   const load = useCallback(async () => {
+    cancelledRef.current = false
     try {
       const result = await getCronJobRuns(jobId)
-      setRuns(result)
-      setError(null)
+      if (!cancelledRef.current) {
+        setRuns(result)
+        setError(null)
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load runs')
+      if (!cancelledRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to load runs')
+      }
     }
   }, [jobId])
 
@@ -667,6 +673,7 @@ function CronJobRuns({
     document.addEventListener('visibilitychange', onVisible)
 
     return () => {
+      cancelledRef.current = true
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', onVisible)
     }

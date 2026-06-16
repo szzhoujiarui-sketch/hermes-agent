@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Codicon } from '@/components/ui/codicon'
 import { DisclosureCaret } from '@/components/ui/disclosure-caret'
@@ -294,14 +294,20 @@ function CronJobSidebarRuns({ jobId, onOpenRun }: { jobId: string; onOpenRun: (s
   const selectedSessionId = useStore($selectedStoredSessionId)
   const [runs, setRuns] = useState<null | SessionInfo[]>(null)
   const [error, setError] = useState<string | null>(null)
+  const cancelledRef = useRef(false)
 
   const load = useCallback(async () => {
+    cancelledRef.current = false
     try {
       const result = await getCronJobRuns(jobId, PEEK_RUN_LIMIT)
-      setRuns(result)
-      setError(null)
+      if (!cancelledRef.current) {
+        setRuns(result)
+        setError(null)
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load runs')
+      if (!cancelledRef.current) {
+        setError(err instanceof Error ? err.message : 'Failed to load runs')
+      }
     }
   }, [jobId])
 
@@ -315,6 +321,7 @@ function CronJobSidebarRuns({ jobId, onOpenRun }: { jobId: string; onOpenRun: (s
     }, PEEK_POLL_INTERVAL_MS)
 
     return () => {
+      cancelledRef.current = true
       window.clearInterval(intervalId)
     }
   }, [load])
