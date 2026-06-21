@@ -547,6 +547,7 @@ function CronJobDetail({
   onPauseResume: () => void
   onTrigger: () => void
 }) {
+  const { t } = useI18n()
   const state = jobState(job)
   const isPaused = state === 'paused'
   const deliver = jobDeliver(job)
